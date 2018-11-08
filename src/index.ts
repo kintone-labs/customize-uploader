@@ -1,8 +1,11 @@
 import chokidar from "chokidar";
 import fs from "fs";
+
+import CustomizeFileStatus from "./CustomizeFileStatus";
 import KintoneApiClient, {
   AuthenticationError,
-  CustomizeManifest
+  CustomizeManifest,
+  FileCustomizeSetting
 } from "./KintoneApiClient";
 import { Lang } from "./lang";
 import { getBoundMessage } from "./messages";
@@ -31,8 +34,9 @@ export async function upload(
     updateBody: CustomizeManifest | null;
     updated: boolean;
   },
-  options: Option
-): Promise<void> {
+  options: Option,
+  customizeFileStatus?: CustomizeFileStatus
+): Promise<CustomizeFileStatus> {
   const m = getBoundMessage(options.lang);
   const appId = manifest.app;
   let { retryCount, updateBody, updated } = status;
@@ -43,21 +47,49 @@ export async function upload(
       try {
         const [desktopJS, desktopCSS, mobileJS] = await Promise.all(
           [
-            { files: manifest.desktop.js, type: "text/javascript" },
-            { files: manifest.desktop.css, type: "text/css" },
-            { files: manifest.mobile.js, type: "text/javascript" }
-          ].map(({ files, type }) =>
+            {
+              files: manifest.desktop.js,
+              type: "text/javascript",
+              target: "desktop"
+            },
+            {
+              files: manifest.desktop.css,
+              type: "text/css",
+              target: "desktop"
+            },
+            {
+              files: manifest.mobile.js,
+              type: "text/javascript",
+              target: "desktop"
+            }
+          ].map(({ files, type, target }) =>
             Promise.all(
-              files.map((file: string) =>
-                kintoneApiClient
+              files.map((file: string, index: number) => {
+                if (
+                  customizeFileStatus &&
+                  customizeFileStatus.canSkipUpload()
+                ) {
+                  const reuseCustomizeSetting: FileCustomizeSetting = {
+                    type: "FILE",
+                    file: {
+                      fileKey: customizeFileStatus.getFileKey(
+                        target,
+                        type,
+                        index
+                      )
+                    }
+                  };
+                  return Promise.resolve(reuseCustomizeSetting);
+                }
+                return kintoneApiClient
                   .prepareCustomizeFile(file, type)
                   .then(result => {
                     if (result.type === "FILE") {
                       console.log(`${file} ` + m("M_Uploaded"));
                     }
                     return result;
-                  })
-              )
+                  });
+              })
             )
           )
         );
@@ -110,12 +142,17 @@ export async function upload(
         kintoneApiClient,
         manifest,
         { retryCount, updateBody, updated },
-        options
+        options,
+        customizeFileStatus
       );
     } else {
       throw e;
     }
   }
+  if (!updateBody) {
+    throw new Error("updateBody must exist");
+  }
+  return new CustomizeFileStatus(manifest);
 }
 
 export const run = async (
@@ -150,7 +187,12 @@ export const run = async (
     domain,
     options
   );
-  await upload(kintoneApiClient, manifest, status, options);
+  const customizeFileStatus = await upload(
+    kintoneApiClient,
+    manifest,
+    status,
+    options
+  );
 
   if (options.watch) {
     const watcher = chokidar.watch(files, {
@@ -161,9 +203,23 @@ export const run = async (
         pollInterval: 100
       }
     });
-    console.log(m("M_Watching"));
-    watcher.on("change", () =>
-      upload(kintoneApiClient, manifest, status, options)
+    let customizeSetting = await kintoneApiClient.getCustomizeSetting(
+      manifest.app
     );
+    customizeFileStatus.setFileKey(customizeSetting);
+    console.log(m("M_Watching"));
+    watcher.on("change", async () => {
+      await upload(
+        kintoneApiClient,
+        manifest,
+        status,
+        options,
+        customizeFileStatus
+      );
+      customizeSetting = await kintoneApiClient.getCustomizeSetting(
+        manifest.app
+      );
+      customizeFileStatus.setFileKey(customizeSetting);
+    });
   }
 };

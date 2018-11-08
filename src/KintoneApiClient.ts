@@ -38,17 +38,29 @@ export interface RequestParams {
   contentType?: string;
 }
 
-type ReturnedCustomizeSetting =
-  | {
-      type: "URL";
-      url: string;
-    }
-  | {
-      type: "FILE";
-      file: {
-        fileKey: string;
-      };
-    };
+export interface CustomizeSetting {
+  desktop: {
+    js: ReturnedCustomizeSetting[];
+    css: ReturnedCustomizeSetting[];
+  };
+  mobile: {
+    js: ReturnedCustomizeSetting[];
+  };
+}
+
+export interface FileCustomizeSetting {
+  type: "FILE";
+  file: {
+    fileKey: string;
+  };
+}
+
+interface URLCustomizeSetting {
+  type: "URL";
+  url: string;
+}
+
+type ReturnedCustomizeSetting = FileCustomizeSetting | URLCustomizeSetting;
 
 export default class KintoneApiClient {
   private auth: string;
@@ -144,6 +156,14 @@ export default class KintoneApiClient {
       }
     }
     deployed = true;
+  }
+
+  public async getCustomizeSetting(app: string): Promise<CustomizeSetting> {
+    return this.sendRequest({
+      method: "GET",
+      path: "/k/v1/app/customize.json",
+      body: { app }
+    });
   }
 
   public async sendRequest(params: RequestParams) {
