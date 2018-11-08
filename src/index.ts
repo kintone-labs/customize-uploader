@@ -1,6 +1,9 @@
 import chokidar from "chokidar";
 import fs from "fs";
-import KintoneApiClient, { AuthenticationError } from "./KintoneApiClient";
+import KintoneApiClient, {
+  AuthenticationError,
+  CustomizeManifest
+} from "./KintoneApiClient";
 import { Lang } from "./lang";
 import { getBoundMessage } from "./messages";
 import { isUrlString, wait } from "./util";
@@ -14,20 +17,8 @@ export interface Option {
 
 export interface Status {
   retryCount: number;
-  updateBody: any;
+  updateBody: CustomizeManifest | null;
   updated: boolean;
-}
-
-export interface CustomizeManifest {
-  app: string;
-  scope: "ALL" | "ADMIN" | "NONE";
-  desktop: {
-    js: string[];
-    css: string[];
-  };
-  mobile: {
-    js: string[];
-  };
 }
 
 const MAX_RETRY_COUNT = 3;
@@ -37,7 +28,7 @@ export async function upload(
   manifest: CustomizeManifest,
   status: {
     retryCount: number;
-    updateBody: any;
+    updateBody: CustomizeManifest | null;
     updated: boolean;
   },
   options: Option

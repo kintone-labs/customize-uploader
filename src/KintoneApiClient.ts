@@ -6,12 +6,24 @@ interface RequestOption {
   method: string;
   url: string;
   headers: {
-    [propName: string]: any;
+    [propName: string]: string;
   };
   body: object | string | null;
   formData?: object;
   proxy?: string;
   tunnel?: boolean;
+}
+
+export interface CustomizeManifest {
+  app: string;
+  scope: "ALL" | "ADMIN" | "NONE";
+  desktop: {
+    js: string[];
+    css: string[];
+  };
+  mobile: {
+    js: string[];
+  };
 }
 
 export interface Option {
@@ -25,6 +37,18 @@ export interface RequestParams {
   body: object;
   contentType?: string;
 }
+
+type ReturnedCustomizeSetting =
+  | {
+      type: "URL";
+      url: string;
+    }
+  | {
+      type: "FILE";
+      file: {
+        fileKey: string;
+      };
+    };
 
 export default class KintoneApiClient {
   private auth: string;
@@ -64,7 +88,7 @@ export default class KintoneApiClient {
   public async prepareCustomizeFile(
     fileOrUrl: string,
     contentType: string
-  ): Promise<any> {
+  ): Promise<ReturnedCustomizeSetting> {
     const isUrl = isUrlString(fileOrUrl);
     if (isUrl) {
       return {
@@ -82,7 +106,7 @@ export default class KintoneApiClient {
     }
   }
 
-  public updateCustomizeSetting(setting: any) {
+  public updateCustomizeSetting(setting: CustomizeManifest) {
     return this.sendRequest({
       method: "PUT",
       path: "/k/v1/preview/app/customize.json",
@@ -106,7 +130,10 @@ export default class KintoneApiClient {
         path: "/k/v1/preview/app/deploy.json",
         body: { apps: [appId] }
       });
-      const successedApps: [any] = resp.apps;
+      interface App {
+        status: string;
+      }
+      const successedApps: App[] = resp.apps;
       const successedAppsLength = successedApps.filter(r => {
         return r.status === "SUCCESS";
       }).length;

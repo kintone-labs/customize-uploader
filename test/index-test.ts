@@ -1,5 +1,6 @@
 import assert from "assert";
-import { CustomizeManifest, Option, Status, upload } from "../src/index";
+import { Option, Status, upload } from "../src/index";
+import { CustomizeManifest } from "../src/KintoneApiClient";
 import MockKintoneApiClient from "./MockKintoneApiClient";
 
 describe("index", () => {
