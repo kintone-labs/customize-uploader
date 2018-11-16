@@ -14,7 +14,7 @@ export const inquireParams = ({ username, password, domain, lang }: Params) => {
   const questions = [
     {
       type: "input",
-      message: m("Q_Domain"),
+      message: m("question.domain"),
       name: "domain",
       default: domain,
       when: () => !domain,
@@ -23,7 +23,7 @@ export const inquireParams = ({ username, password, domain, lang }: Params) => {
     {
       type: "input",
       name: "username",
-      message: m("Q_UserName"),
+      message: m("question.username"),
       default: username,
       when: () => !username,
       validate: (v: string) => !!v
@@ -31,7 +31,7 @@ export const inquireParams = ({ username, password, domain, lang }: Params) => {
     {
       type: "password",
       name: "password",
-      message: m("Q_Password"),
+      message: m("question.password"),
       default: password,
       when: () => !password,
       validate: (v: string) => !!v

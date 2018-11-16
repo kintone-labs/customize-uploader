@@ -4,76 +4,70 @@ type LangMap = { [lang in Lang]: string };
 type MessageMap = { [key in keyof typeof messages]: LangMap };
 
 const messages = {
-  E_requiredManifestFile: {
+  "error.required.manifest": {
     en: "Please specify manifest file",
     ja: "マニフェストファイルを指定してください"
   },
-  Q_Domain: {
+  "question.domain": {
     en: "Input your kintone's domain (example.cybozu.com):",
     ja: "kintoneのドメインを入力してください (example.cybozu.com):"
   },
-  Q_UserName: {
+  "question.username": {
     en: "Input your username:",
     ja: "ログイン名を入力してください:"
   },
-  Q_Password: {
+  "question.password": {
     en: "Input your password:",
     ja: "パスワードを入力してください:"
   },
-  M_StartUploading: {
+  "start.uploading": {
     en: "Start uploading customize files",
     ja: "カスタマイズのアップロードを開始します"
   },
-  M_FileUploaded: {
+  "upload.file": {
     en: "JavaScript/CSS files have been uploaded!",
     ja: "JavaScript/CSS ファイルをアップロードしました!"
   },
-  E_FileUploaded: {
+  "error.upload.file": {
     en: "Failed to upload JavaScript/CSS files",
     ja: "JavaScript/CSS ファイルのアップロードに失敗しました"
   },
-  M_Uploaded: {
+  "has.uploaded": {
     en: "has been uploaded!",
     ja: "をアップロードしました!"
   },
-  M_Updated: {
+  "update.file": {
     en: "Customize setting has been updated!",
     ja: "JavaScript/CSS カスタマイズの設定を変更しました!"
   },
-  E_Updated: {
+  "error.update.file": {
     en: "Failed to update customize setting",
     ja: "JavaScript/CSS カスタマイズの設定の変更に失敗しました"
   },
-  M_Deployed: {
+  "has.deployed": {
     en: "Setting has been deployed!",
     ja: "運用環境に反映しました!"
   },
-  E_Authentication: {
+  "error.authentication": {
     en:
       "Failed to authenticate. Please confirm your username, password, and domain",
     ja: "認証に失敗しました。ログイン名、パスワード、ドメインを確認してください"
   },
-  E_Deployed: {
+  "error.deploy": {
     en: "Failed to deploy setting",
     ja: "運用環境への反映に失敗しました"
   },
-  M_Deploying: {
+  "wait.deploy": {
     en: "Wait for deploying completed...",
     ja: "運用環境への反映の完了を待っています..."
   },
-  M_Watching: {
+  "watch.file": {
     en: "Watching for file changes...",
     ja: "ファイルの変更を監視しています..."
   },
-  E_Retry: {
+  "error.then.retry": {
     en: "An error occured, retry",
     ja: "エラーが発生しました。リトライします"
-  },
-  E_Exit: {
-    en:
-      "An error occured, exit process. Please check if you passed proper arguments and manifest file",
-    ja:
-      "エラーが発生しました。引数の値と、マニフェストファイルに正しい値が入力されているか確認してください"
   }
 };
 

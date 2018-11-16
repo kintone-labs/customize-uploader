@@ -48,7 +48,7 @@ export async function upload(
 
   try {
     if (!updateBody) {
-      console.log(m("M_StartUploading"));
+      console.log(m("start.uploading"));
       try {
         const [desktopJS, desktopCSS, mobileJS] = await Promise.all(
           [
@@ -62,7 +62,7 @@ export async function upload(
                   .prepareCustomizeFile(file, type)
                   .then(result => {
                     if (result.type === "FILE") {
-                      console.log(`${file} ` + m("M_Uploaded"));
+                      console.log(`${file} ` + m("has.uploaded"));
                     }
                     return result;
                   })
@@ -79,9 +79,9 @@ export async function upload(
             js: mobileJS
           }
         });
-        console.log(m("M_FileUploaded"));
+        console.log(m("upload.file"));
       } catch (e) {
-        console.log(m("E_FileUploaded"));
+        console.log(m("error.upload.file"));
         throw e;
       }
     }
@@ -89,10 +89,10 @@ export async function upload(
     if (!updated) {
       try {
         await kintoneApiClient.updateCustomizeSetting(updateBody);
-        console.log(m("M_Updated"));
+        console.log(m("update.file"));
         updated = true;
       } catch (e) {
-        console.log(m("E_Updated"));
+        console.log(m("error.update.file"));
         throw e;
       }
     }
@@ -100,21 +100,21 @@ export async function upload(
     try {
       await kintoneApiClient.deploySetting(appId);
       await kintoneApiClient.waitFinishingDeploy(appId, () =>
-        console.log(m("M_Deploying"))
+        console.log(m("wait.deploy"))
       );
-      console.log(m("M_Deployed"));
+      console.log(m("has.deployed"));
     } catch (e) {
-      console.log(m("E_Deployed"));
+      console.log(m("error.deploy"));
       throw e;
     }
   } catch (e) {
     const isAuthenticationError = e instanceof AuthenticationError;
     retryCount++;
     if (isAuthenticationError) {
-      throw new Error(m("E_Authentication"));
+      throw new Error(m("error.authentication"));
     } else if (retryCount < MAX_RETRY_COUNT) {
       await wait(1000);
-      console.log(m("E_Retry"));
+      console.log(m("error.then.retry"));
       await upload(
         kintoneApiClient,
         manifest,
@@ -170,7 +170,7 @@ export const run = async (
         pollInterval: 100
       }
     });
-    console.log(m("M_Watching"));
+    console.log(m("watch.file"));
     watcher.on("change", () =>
       upload(kintoneApiClient, manifest, status, options)
     );

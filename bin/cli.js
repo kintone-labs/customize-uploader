@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-const osLocale = require('os-locale');
-const meow = require('meow');
-const { run } = require('../dist/src/index');
-const { inquireParams } = require('../dist/src/params');
-const { getDefaultLang } = require('../dist/src/lang');
-const { getMessage } = require('../dist/src/messages');
+const osLocale = require("os-locale");
+const meow = require("meow");
+const { run } = require("../dist/src/index");
+const { inquireParams } = require("../dist/src/params");
+const { getDefaultLang } = require("../dist/src/lang");
+const { getMessage } = require("../dist/src/messages");
 
 const {
   HTTP_PROXY,
@@ -42,41 +42,41 @@ const cli = meow(
   {
     flags: {
       domain: {
-        type: 'string',
+        type: "string",
         default: KINTONE_DOMAIN
       },
       username: {
-        type: 'string',
+        type: "string",
         default: KINTONE_USERNAME
       },
       password: {
-        type: 'string',
+        type: "string",
         default: KINTONE_PASSWORD
       },
       basicAuthUsername: {
-        type: 'string',
+        type: "string",
         default: KINTONE_BASIC_AUTH_USERNAME
       },
       basicAuthPassword: {
-        type: 'string',
+        type: "string",
         default: KINTONE_BASIC_AUTH_PASSWORD
       },
       proxy: {
-        type: 'string',
+        type: "string",
         default: HTTPS_PROXY || HTTP_PROXY
       },
       watch: {
-        type: 'boolean',
+        type: "boolean",
         default: false
       },
       lang: {
-        type: 'string',
+        type: "string",
         default: getDefaultLang(osLocale.sync())
       },
       guestSpaceId: {
-        type: 'number',
+        type: "number",
         default: 0
-      },
+      }
     }
   }
 );
@@ -100,14 +100,21 @@ if (guestSpaceId) {
 }
 
 if (!manifestFile) {
-  console.error(getMessage(lang, 'E_requiredManifestFile'));
+  console.error(getMessage(lang, "error.required.manifest"));
   cli.showHelp();
   process.exit(1);
 }
 
 inquireParams({ username, password, domain, lang })
-  .then(({ username, password, domain }) => (
-    run(domain, username, password, basicAuthUsername, basicAuthPassword, manifestFile, options)
-  ))
+  .then(({ username, password, domain }) =>
+    run(
+      domain,
+      username,
+      password,
+      basicAuthUsername,
+      basicAuthPassword,
+      manifestFile,
+      options
+    )
+  )
   .catch(error => console.log(error.message));
-  ;
