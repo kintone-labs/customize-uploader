@@ -17,7 +17,9 @@
     "tslint": "tslint -c tslint.json src/**/*.ts test/**/*.ts",
     "release": "run-s lint build && standard-version",
     "release:dryrun": "standard-version --dry-run",
-    "test": "mocha --require ts-node/register --watch-extensions ts test/**/*-test.ts"
+    "test": "mocha --require ts-node/register --watch-extensions ts test/**/*-test.ts",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "files": [
     "bin",
@@ -61,6 +63,8 @@
     "os-locale": "^3.1.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
-    "rimraf": "^2.6.3"
-  }
+    "rimraf": "^2.6.3",
+    "snyk": "^1.189.0"
+  },
+  "snyk": true
 }
